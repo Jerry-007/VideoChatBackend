@@ -30,31 +30,31 @@ io.on("connection", (socket) => {
     const usersInRoom = users[roomId].filter((id) => id !== socket.id);
 
     socket.emit("users", usersInRoom);
+  });
 
-    socket.on("sendingSignals", (data) => {
-      io.to(data.userToSignal).emit("userJoined", {
-        signal: data.signal,
-        callerId: data.callerId,
-      });
+  socket.on("sendingSignals", (data) => {
+    io.to(data.userToSignal).emit("userJoined", {
+      signal: data.signal,
+      callerId: data.callerId,
     });
+  });
 
-    socket.on("returningSignal", (data) => {
-      io.to(data.callerId).emit("receivedReturnedSignal", {
-        signal: data.signal,
-        id: socket.id,
-      });
+  socket.on("returningSignal", (data) => {
+    io.to(data.callerId).emit("receivedReturnedSignal", {
+      signal: data.signal,
+      id: socket.id,
     });
+  });
 
-    socket.on("disconnect", () => {
-      const roomID = socketToRoom[socket.id];
-      let room = users[roomID];
-      if (room) {
-        room = room.filter((id) => id !== socket.id);
-        users[roomID] = room;
-      }
+  socket.on("disconnect", () => {
+    const roomID = socketToRoom[socket.id];
+    let room = users[roomID];
+    if (room) {
+      room = room.filter((id) => id !== socket.id);
+      users[roomID] = room;
+    }
 
-      socket.broadcast.emit("user left", socket.id);
-    });
+    socket.broadcast.emit("user left", socket.id);
   });
 });
 
